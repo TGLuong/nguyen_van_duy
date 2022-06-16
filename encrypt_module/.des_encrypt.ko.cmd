@@ -1,1 +1,0 @@
-cmd_/home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.ko /home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.o /home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.mod.o;  true

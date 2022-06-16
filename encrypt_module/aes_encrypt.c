@@ -14,7 +14,7 @@ dev_t dev_num;
 struct class *device_class;
 struct cdev *char_device;
 struct crypto_cipher *tfm;
-char key[16] = "12345678";
+char key[20] = "0123456789abcdef";
 char type[100];
 char data[MEM_SIZE];
 size_t data_len = 0;
@@ -81,15 +81,15 @@ static ssize_t read_fun(struct file *file, char *user_buf, size_t len, loff_t *o
     memset(cipher, 0, sizeof(cipher));
     memset(hex_cipher, 0, sizeof(hex_cipher));
 
-    for (i = 0; i < data_len / 8; i++)
+    for (i = 0; i < data_len / 16; i++)
     {
-        char one_data[10], one_cipher[10];
+        char one_data[20], one_cipher[20];
 
         memset(one_data, 0, sizeof(one_data));
         memset(one_cipher, 0, sizeof(one_cipher));
 
-        for (j = 0; j < 8; j++)
-            one_data[j] = data[i * 8 + j];
+        for (j = 0; j < 16; j++)
+            one_data[j] = data[i * 16 + j];
 
         printk("one data: %s\n", one_data);
 
@@ -97,15 +97,15 @@ static ssize_t read_fun(struct file *file, char *user_buf, size_t len, loff_t *o
             crypto_cipher_encrypt_one(tfm, one_cipher, one_data);
         if (strcmp(type, "decrypt") == 0)
             crypto_cipher_decrypt_one(tfm, one_cipher, one_data);
-        for (j = 0; j < 8; j++)
-            cipher[i * 8 + j] = one_cipher[j];
+        for (j = 0; j < 16; j++)
+            cipher[i * 16 + j] = one_cipher[j];
 
-        // printk("one cipher: %s\n", one_cipher);
+        printk("one cipher: %s\n", one_cipher);
     }
 
     hextostring(cipher, data_len, hex_cipher);
     printk("hex cipher: %s\n", hex_cipher);
-    copy_to_user(user_buf, hex_cipher, strlen(hex_cipher));
+    copy_to_user(user_buf, hex_cipher, data_len * 2);
 
     return 0;
 }
@@ -147,10 +147,10 @@ static ssize_t write_fun(struct file *file, const char *user_buff, size_t len, l
     stringtohex(hex_data, strlen(hex_data), data);
     printk("data: %s\n", data);
 
-    if (strlen(hex_data) % 16 == 0)
-        data_len = ((uint16_t)(strlen(hex_data) / 16)) * 8;
+    if (strlen(hex_data) % 32 == 0)
+        data_len = ((uint16_t)(strlen(hex_data) / 32)) * 16;
     else
-        data_len = ((uint16_t)((strlen(hex_data) / 16) + 1)) * 8;
+        data_len = ((uint16_t)((strlen(hex_data) / 32) + 1)) * 16;
     return 0;
 }
 
@@ -165,12 +165,12 @@ static int md_init(void)
 {
     printk("cai dat module\n");
 
-    tfm = crypto_alloc_cipher("des", 0, 0);
-    crypto_cipher_setkey(tfm, key, 8);
+    tfm = crypto_alloc_cipher("aes", 0, 0);
+    crypto_cipher_setkey(tfm, key, 16);
 
     alloc_chrdev_region(&dev_num, 0, 1, "tenthietbi");
     device_class = class_create(THIS_MODULE, "class");
-    device_create(device_class, NULL, dev_num, NULL, "des_encrypt");
+    device_create(device_class, NULL, dev_num, NULL, "aes_encrypt");
 
     kernel_buffer = kmalloc(MEM_SIZE, GFP_KERNEL);
 

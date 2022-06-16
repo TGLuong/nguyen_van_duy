@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#define DRIVER_FILE_NAME "/dev/des_encrypt"
+#define DRIVER_FILE_NAME "/dev/aes_encrypt"
 
 
 
