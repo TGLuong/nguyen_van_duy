@@ -1,0 +1,1 @@
+cmd_/home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.mod := { echo  /home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.o;  echo; } > /home/embedded/hoang_phuong_name/encrypt_module/des_encrypt.mod
